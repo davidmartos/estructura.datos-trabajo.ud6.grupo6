@@ -12,117 +12,196 @@ struct student
     char phone[9];
     char email[50];
     int enrolled;
-    struct student *next;
-}*arr_student[MAX];
+}*students[MAX];
 
-int h(int k, int m)
+int main()
+{
+    int option = 1;
+
+    while(option != 0)
+    {
+        printf("Selecciona una opcion\n");
+        printf("1 - Anadir nuevo alumno\n");
+        printf("2 - Mostrar listado alumnos\n");
+        printf("3 - Modificar valor matriculacion\n");
+        printf("4 - Eliminar alumno\n");
+        printf("5 - Guardar fichero (alumnos.txt)\n");
+        printf("0 - Salir\n");
+        printf("Opcion: ");
+        scanf("%d", &option);
+
+        switch(option)
+        {
+        case 1:
+            createStudent();
+            break;
+        case 2:
+            showList();
+            break;
+        case 3:
+            updateStudent();
+            break;
+        case 4:
+            deleteStudent();
+            break;
+        case 5:
+            saveFile();
+            break;
+        }
+
+    }
+    printf("Adios\n");
+    return 0;
+}
+
+int hash(int k, int m)
 {
     return floor(m * (k*A - floor(k*A)));
 }
 
-int main()
+void createStudent()
 {
-    struct student *temp, *temp2;
-    int arrayIndex=0,key_roll=0;
-    int flag = 1,search_flag =1;
+    struct student *aux;
+    int arrayIndex=0;
 
-    while(flag == 1)
-    {
+    aux = (struct student*)malloc(sizeof(struct student));
 
-        temp = (struct student*)malloc(sizeof(struct student));
+    printf("\tIntroducir id de usuario: ");
+    scanf("%d", &aux->id);
 
-        printf("Introducir id de usuario: ");
-        scanf("%d", &temp->id);
+    printf("\tIntroduce el nombre: ");
+    scanf("%s", &aux->name);
 
-        printf("Introduce el nombre: ");
-        scanf("%s", &temp->name);
+    printf("\tIntroduce el telefono: ");
+    scanf("%s", &aux->phone);
 
-        printf("Introduce el telefono: ");
-        scanf("%s", &temp->phone);
+    printf("\tIntroduce el email: ");
+    scanf("%s", &aux->email);
 
-        printf("Introduce el email: ");
-        scanf("%s", &temp->email);
+    printf("\t¿Está matriculado? (Si-> 1/No->0): ");
+    scanf("%d", &aux->enrolled);
 
-        printf("¿Está matriculado? (Si-> 1/No->0): ");
-        scanf("%d", temp->enrolled);
-
-        temp->next = NULL;
-
-        //hash calculation using multiplication method
-        arrayIndex = h(temp->roll_no,11);
-        printf("%d \t : %d \n", temp->id, arrayIndex);
-
-        // Checking for hash collision
-        // default initial value of roll no is use senitel value
-        // initial value for global array of poiniter is 0
-
-        if (arr_student[arrayIndex] != 0)
-        {
-            printf("\n\nA hash collision detected\n");
-            printf("New data will addedd to the chain.\n");
-            temp2 = arr_student[arrayIndex];
-            while(temp2->next != NULL)
-            {
-                temp2 = temp2->next;
-            }
-            temp2->next = temp;
-
-        }
-        else
-        {
-            // using hash value to store a student record
-            arr_student[arrayIndex] = (struct student *)malloc(sizeof(struct student));
-            arr_student[arrayIndex] = temp;
-        }
-
-        printf("Do you want to add more entry:(Yes-> 1/No->0)");
-        scanf("%d",&flag);
-    }
+    arrayIndex = hash(aux->id,11);
 
     printf("\n");
 
-    while(search_flag == 1)
+    if (students[arrayIndex] != 0)
     {
-        printf("\n");
-        // searching a student information based on hash value
-        printf("Enter Roll number so show the details: ");
-        scanf("%d", &key_roll);
-        //hash calculation using multiplication method
-        arrayIndex = h(key_roll,11);
-        //Need to compare the stored value with the search key (roll no)
-        if(arr_student[arrayIndex])
-        {
-            if (arr_student[arrayIndex]->roll_no == key_roll)
-            {
-                printf("\n\t \t Name: %s \t Roll:%d \t Marks: %.2f\n\n",
-                       arr_student[arrayIndex]->name, arr_student[arrayIndex]->roll_no, arr_student[arrayIndex]->marks);
-            }
+        printf("Ese id de usuario ya existe\n");
+    }
+    else
+    {
+        printf("\tid: %d \t -> index hash: %d \n", aux->id, arrayIndex);
+        students[arrayIndex] = (struct student *)malloc(sizeof(struct student));
+        students[arrayIndex] = aux;
+    }
 
-            else
-            {
-                if(arr_student[arrayIndex]->next)
-                {
-                    temp2 = arr_student[arrayIndex];
-                    while(temp2->next != NULL)
-                    {
-                        temp2 = temp2->next;
-                        if (temp2->roll_no == key_roll)
-                        {
-                            printf("\n\t \t Name: %s \t Roll:%d \t Marks: %.2f\n\n",temp2->name, temp2->roll_no,temp2->marks);
-                            break;
-                        }
-                    }
-                    printf("Record with Roll No:%d not found!\n",key_roll);
-                }
-            }
+    printf("\n");
+}
+
+void updateStudent()
+{
+    struct student *aux;
+    int index=0,key=0;
+
+    printf("\tIntroduce el id del alumno: ");
+    scanf("%d", &key);
+    index = hash(key,11);
+
+    printf("\n");
+
+    if (students[index] != NULL)
+    {
+        if (students[index]->id == key)
+        {
+            aux = students[index];
+            printf("\t\tAlumno encontrado. Nombre: %s\n", &aux->name);
+            printf("\t\tEsta matriculado? (Si-> 1/No->0): ");
+            scanf("%d", &aux->enrolled);
+            printf("\t\t->Alumno actualizado\n");
         }
+
         else
         {
-            printf("Record with Roll No:%d not found!\n",key_roll);
+            printf("\t\tEstudiante con id %d no encontrado\n", key);
+        }
+    }
+    else
+    {
+        printf("\t\tEstudiante con id %d no encontrado\n", key);
+    }
+    printf("\n");
+}
+
+void deleteStudent()
+{
+    int index=0,key=0;
+
+    printf("\tIntroduce el id del alumno: ");
+    scanf("%d", &key);
+    index = hash(key,11);
+
+    printf("\n");
+
+    if (students[index] != NULL)
+    {
+
+        if (students[index]->id == key)
+        {
+            printf("\t\tAlumno encontrado. Nombre: %s\n", students[index]->name);
+            free(students[index]);
+            students[index] = NULL;
+            printf("\t\t->Alumno eliminado\n");
         }
 
-        printf("Do you want search more record:(Yes-> 1/No->0)");
-        scanf("%d",&search_flag);
+        else
+        {
+            printf("\t\tEstudiante con id %d no encontrado\n", key);
+        }
     }
-    return 0;
+    else
+    {
+        printf("\t\tEstudiante con id %d no encontrado\n", key);
+    }
+    printf("\n");
+}
+
+void showList()
+{
+    printf("\n");
+
+    for(int i = 0; i < MAX; i++ )
+    {
+        if(students[i] != NULL)
+        {
+            printf("\t\tAlumno con id %d: ", students[i]->id);
+            printf("%s\t %s\t %s\t %s\n",
+                   students[i]->name, students[i]->phone, students[i]->email, students[i]->enrolled == 1 ? "Si" : "No");
+        }
+    }
+
+    printf("\n");
+}
+
+void saveFile()
+{
+    FILE *file;
+
+    if((file   = fopen("alumnos.txt", "w"))==NULL)
+    {
+        printf("No se puede abrir el fichero alumnos.txt\n");
+        exit(1);
+    };
+
+    for(int i = 0; i < MAX; i++ )
+    {
+        if(students[i] != NULL)
+        {
+            fprintf(file, "Alumno id %d\t|\tNombre %s\t|\tEmail %s\t|\tTelefono %s\t|\tMatriculado %s\n", students[i]->id, students[i]->name, students[i]->email, students[i]->phone, students[i]->enrolled == 1 ? "Si" : "No");
+        }
+    }
+
+    printf("\t\t->alumnos.txt guardado\n");
+
+    fclose(file);
 }
