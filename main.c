@@ -5,6 +5,13 @@
 #define MAX 10
 #define A 0.6180339887
 
+/************************************************************
+Autores: Victor Rillo Martinez / David Martos Grande
+Fecha: 12/06/2020
+Asignatura: Estructura de Datos y Algoritmos, curso 19/20
+Tarea: Actividad práctica UD6
+************************************************************/
+
 struct student
 {
     int id;
